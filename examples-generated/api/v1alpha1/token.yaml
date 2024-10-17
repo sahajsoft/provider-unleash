@@ -1,4 +1,4 @@
-apiVersion: api.crossplane.io/v1alpha1
+apiVersion: api.unleash.crossplane.io/v1alpha1
 kind: Token
 metadata:
   annotations:

@@ -4,9 +4,9 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.14.0
-  name: tokens.api.crossplane.io
+  name: tokens.api.unleash.crossplane.io
 spec:
-  group: api.crossplane.io
+  group: api.unleash.crossplane.io
   names:
     categories:
     - crossplane
