@@ -4,18 +4,18 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.14.0
-  name: resources.null.template.upbound.io
+  name: tokens.api.crossplane.io
 spec:
-  group: null.template.upbound.io
+  group: api.crossplane.io
   names:
     categories:
     - crossplane
     - managed
-    - template
-    kind: Resource
-    listKind: ResourceList
-    plural: resources
-    singular: resource
+    - unleash
+    kind: Token
+    listKind: TokenList
+    plural: tokens
+    singular: token
   scope: Cluster
   versions:
   - additionalPrinterColumns:
@@ -34,10 +34,7 @@ spec:
     name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: Resource is the Schema for the Resources API. The null_resource
-          resource implements the standard resource lifecycle but takes no further
-          action.hashicorp. The triggers argument allows specifying an arbitrary set
-          of values that, when changed, will cause the resource to be replaced.
+        description: Token is the Schema for the Tokens API. ApiToken schema
         properties:
           apiVersion:
             description: |-
@@ -57,7 +54,7 @@ spec:
           metadata:
             type: object
           spec:
-            description: ResourceSpec defines the desired state of Resource
+            description: TokenSpec defines the desired state of Token
             properties:
               deletionPolicy:
                 default: Delete
@@ -75,14 +72,39 @@ spec:
                 type: string
               forProvider:
                 properties:
-                  triggers:
-                    additionalProperties:
-                      type: string
+                  environment:
                     description: |-
-                      running any associated provisioners.
-                      A map of arbitrary strings that, when changed, will force the null resource to be replaced, re-running any associated provisioners.
-                    type: object
-                    x-kubernetes-map-type: granular
+                      (String) An environment the token has access to.
+                      An environment the token has access to.
+                    type: string
+                  expiresAt:
+                    description: |-
+                      (String) When the token expires
+                      When the token expires
+                    type: string
+                  project:
+                    description: |-
+                      (String) A project the token belongs to.
+                      A project the token belongs to.
+                    type: string
+                  projects:
+                    description: |-
+                      (Set of String) The list of projects this token has access to. If the token has access to specific projects they will be listed here. If the token has access to all projects it will be represented as [*].
+                      The list of projects this token has access to. If the token has access to specific projects they will be listed here. If the token has access to all projects it will be represented as `[*]`.
+                    items:
+                      type: string
+                    type: array
+                    x-kubernetes-list-type: set
+                  tokenName:
+                    description: |-
+                      (String) The name of the token.
+                      The name of the token.
+                    type: string
+                  type:
+                    description: |-
+                      (String) The type of the token.
+                      The type of the token.
+                    type: string
                 type: object
               initProvider:
                 description: |-
@@ -97,14 +119,39 @@ spec:
                   for example because of an external controller is managing them, like an
                   autoscaler.
                 properties:
-                  triggers:
-                    additionalProperties:
-                      type: string
+                  environment:
                     description: |-
-                      running any associated provisioners.
-                      A map of arbitrary strings that, when changed, will force the null resource to be replaced, re-running any associated provisioners.
-                    type: object
-                    x-kubernetes-map-type: granular
+                      (String) An environment the token has access to.
+                      An environment the token has access to.
+                    type: string
+                  expiresAt:
+                    description: |-
+                      (String) When the token expires
+                      When the token expires
+                    type: string
+                  project:
+                    description: |-
+                      (String) A project the token belongs to.
+                      A project the token belongs to.
+                    type: string
+                  projects:
+                    description: |-
+                      (Set of String) The list of projects this token has access to. If the token has access to specific projects they will be listed here. If the token has access to all projects it will be represented as [*].
+                      The list of projects this token has access to. If the token has access to specific projects they will be listed here. If the token has access to all projects it will be represented as `[*]`.
+                    items:
+                      type: string
+                    type: array
+                    x-kubernetes-list-type: set
+                  tokenName:
+                    description: |-
+                      (String) The name of the token.
+                      The name of the token.
+                    type: string
+                  type:
+                    description: |-
+                      (String) The type of the token.
+                      The type of the token.
+                    type: string
                 type: object
               managementPolicies:
                 default:
@@ -274,22 +321,45 @@ spec:
             - forProvider
             type: object
           status:
-            description: ResourceStatus defines the observed state of Resource.
+            description: TokenStatus defines the observed state of Token.
             properties:
               atProvider:
                 properties:
-                  id:
-                    description: (String) This is set to a random value at create
-                      time.
-                    type: string
-                  triggers:
-                    additionalProperties:
-                      type: string
+                  environment:
                     description: |-
-                      running any associated provisioners.
-                      A map of arbitrary strings that, when changed, will force the null resource to be replaced, re-running any associated provisioners.
-                    type: object
-                    x-kubernetes-map-type: granular
+                      (String) An environment the token has access to.
+                      An environment the token has access to.
+                    type: string
+                  expiresAt:
+                    description: |-
+                      (String) When the token expires
+                      When the token expires
+                    type: string
+                  id:
+                    type: string
+                  project:
+                    description: |-
+                      (String) A project the token belongs to.
+                      A project the token belongs to.
+                    type: string
+                  projects:
+                    description: |-
+                      (Set of String) The list of projects this token has access to. If the token has access to specific projects they will be listed here. If the token has access to all projects it will be represented as [*].
+                      The list of projects this token has access to. If the token has access to specific projects they will be listed here. If the token has access to all projects it will be represented as `[*]`.
+                    items:
+                      type: string
+                    type: array
+                    x-kubernetes-list-type: set
+                  tokenName:
+                    description: |-
+                      (String) The name of the token.
+                      The name of the token.
+                    type: string
+                  type:
+                    description: |-
+                      (String) The type of the token.
+                      The type of the token.
+                    type: string
                 type: object
               conditions:
                 description: Conditions of the resource.
