@@ -54,7 +54,33 @@ Build binary:
 make build
 ```
 
+## Testing
+
+- Install unleash server on the cluster or configure the provider to use an existing server.
+- Modify `examples/provider/secrets.yaml` with the correct values.
+
+Apply the manifest:
+
+```
+k apply -f examples/providerconfig/secrets.yaml
+k apply -f examples/providerconfig/providerconfig.yaml
+```
+
+Apply the example token manifest:
+
+```
+k apply -f examples/token/token.yaml
+```
+
 ## Report a Bug
 
 For filing bugs, suggesting improvements, or requesting new features, please
 open an [issue](https://github.com/sahajsoft/provider-unleash/issues).
+
+## Examples
+
+You can find provider config and token configuration examples in the [examples](./examples) directory.
+
+## Notes
+
+This was automatically generated using [Upjet](https://github.com/crossplane/upjet/blob/main/docs/generating-a-provider.md)
