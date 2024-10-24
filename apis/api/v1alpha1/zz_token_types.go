@@ -15,94 +15,101 @@ import (
 
 type TokenInitParameters struct {
 
-	// (String) An environment the token has access to.
-	// An environment the token has access to.
+	// (String) The API token creation date.
+	// The API token creation date.
+	CreatedAt *string `json:"createdAt,omitempty" tf:"created_at,omitempty"`
+
+	// (String) The environment the token will have access to. Use "*" for all environments. By default, it will have access to all environments.
+	// The environment the token will have access to. Use `"*"` for all environments. By default, it will have access to all environments.
 	Environment *string `json:"environment,omitempty" tf:"environment,omitempty"`
 
-	// (String) When the token expires
-	// When the token expires
+	// (String) The API token expiration date.
+	// The API token expiration date.
 	ExpiresAt *string `json:"expiresAt,omitempty" tf:"expires_at,omitempty"`
 
-	// (String) A project the token belongs to.
-	// A project the token belongs to.
-	Project *string `json:"project,omitempty" tf:"project,omitempty"`
-
-	// (Set of String) The list of projects this token has access to. If the token has access to specific projects they will be listed here. If the token has access to all projects it will be represented as [*].
-	// The list of projects this token has access to. If the token has access to specific projects they will be listed here. If the token has access to all projects it will be represented as `[*]`.
+	// (Set of String) The project(s) the token will have access to. Use ["*"] for all projects. By default, it will have access to all projects.
+	// The project(s) the token will have access to. Use `["*"]` for all projects. By default, it will have access to all projects.
 	// +listType=set
 	Projects []*string `json:"projects,omitempty" tf:"projects,omitempty"`
 
-	// (String) The name of the token.
-	// The name of the token.
-	TokenName *string `json:"tokenName,omitempty" tf:"token_name,omitempty"`
+	// (String, Sensitive) The API token secret.
+	// The API token secret.
+	SecretSecretRef *v1.SecretKeySelector `json:"secretSecretRef,omitempty" tf:"-"`
 
-	// (String) The type of the token.
-	// The type of the token.
+	// (String) The type of the API token. Can be client, admin or frontend
+	// The type of the API token. Can be `client`, `admin` or `frontend`
 	Type *string `json:"type,omitempty" tf:"type,omitempty"`
+
+	// (String)
+	Username *string `json:"username,omitempty" tf:"username,omitempty"`
 }
 
 type TokenObservation struct {
 
-	// (String) An environment the token has access to.
-	// An environment the token has access to.
+	// (String) The API token creation date.
+	// The API token creation date.
+	CreatedAt *string `json:"createdAt,omitempty" tf:"created_at,omitempty"`
+
+	// (String) The environment the token will have access to. Use "*" for all environments. By default, it will have access to all environments.
+	// The environment the token will have access to. Use `"*"` for all environments. By default, it will have access to all environments.
 	Environment *string `json:"environment,omitempty" tf:"environment,omitempty"`
 
-	// (String) When the token expires
-	// When the token expires
+	// (String) The API token expiration date.
+	// The API token expiration date.
 	ExpiresAt *string `json:"expiresAt,omitempty" tf:"expires_at,omitempty"`
 
+	// (String) The ID of this resource.
 	ID *string `json:"id,omitempty" tf:"id,omitempty"`
 
-	// (String) A project the token belongs to.
-	// A project the token belongs to.
-	Project *string `json:"project,omitempty" tf:"project,omitempty"`
-
-	// (Set of String) The list of projects this token has access to. If the token has access to specific projects they will be listed here. If the token has access to all projects it will be represented as [*].
-	// The list of projects this token has access to. If the token has access to specific projects they will be listed here. If the token has access to all projects it will be represented as `[*]`.
+	// (Set of String) The project(s) the token will have access to. Use ["*"] for all projects. By default, it will have access to all projects.
+	// The project(s) the token will have access to. Use `["*"]` for all projects. By default, it will have access to all projects.
 	// +listType=set
 	Projects []*string `json:"projects,omitempty" tf:"projects,omitempty"`
 
-	// (String) The name of the token.
-	// The name of the token.
-	TokenName *string `json:"tokenName,omitempty" tf:"token_name,omitempty"`
-
-	// (String) The type of the token.
-	// The type of the token.
+	// (String) The type of the API token. Can be client, admin or frontend
+	// The type of the API token. Can be `client`, `admin` or `frontend`
 	Type *string `json:"type,omitempty" tf:"type,omitempty"`
+
+	// (String)
+	Username *string `json:"username,omitempty" tf:"username,omitempty"`
 }
 
 type TokenParameters struct {
 
-	// (String) An environment the token has access to.
-	// An environment the token has access to.
+	// (String) The API token creation date.
+	// The API token creation date.
+	// +kubebuilder:validation:Optional
+	CreatedAt *string `json:"createdAt,omitempty" tf:"created_at,omitempty"`
+
+	// (String) The environment the token will have access to. Use "*" for all environments. By default, it will have access to all environments.
+	// The environment the token will have access to. Use `"*"` for all environments. By default, it will have access to all environments.
 	// +kubebuilder:validation:Optional
 	Environment *string `json:"environment,omitempty" tf:"environment,omitempty"`
 
-	// (String) When the token expires
-	// When the token expires
+	// (String) The API token expiration date.
+	// The API token expiration date.
 	// +kubebuilder:validation:Optional
 	ExpiresAt *string `json:"expiresAt,omitempty" tf:"expires_at,omitempty"`
 
-	// (String) A project the token belongs to.
-	// A project the token belongs to.
-	// +kubebuilder:validation:Optional
-	Project *string `json:"project,omitempty" tf:"project,omitempty"`
-
-	// (Set of String) The list of projects this token has access to. If the token has access to specific projects they will be listed here. If the token has access to all projects it will be represented as [*].
-	// The list of projects this token has access to. If the token has access to specific projects they will be listed here. If the token has access to all projects it will be represented as `[*]`.
+	// (Set of String) The project(s) the token will have access to. Use ["*"] for all projects. By default, it will have access to all projects.
+	// The project(s) the token will have access to. Use `["*"]` for all projects. By default, it will have access to all projects.
 	// +kubebuilder:validation:Optional
 	// +listType=set
 	Projects []*string `json:"projects,omitempty" tf:"projects,omitempty"`
 
-	// (String) The name of the token.
-	// The name of the token.
+	// (String, Sensitive) The API token secret.
+	// The API token secret.
 	// +kubebuilder:validation:Optional
-	TokenName *string `json:"tokenName,omitempty" tf:"token_name,omitempty"`
+	SecretSecretRef *v1.SecretKeySelector `json:"secretSecretRef,omitempty" tf:"-"`
 
-	// (String) The type of the token.
-	// The type of the token.
+	// (String) The type of the API token. Can be client, admin or frontend
+	// The type of the API token. Can be `client`, `admin` or `frontend`
 	// +kubebuilder:validation:Optional
 	Type *string `json:"type,omitempty" tf:"type,omitempty"`
+
+	// (String)
+	// +kubebuilder:validation:Optional
+	Username *string `json:"username,omitempty" tf:"username,omitempty"`
 }
 
 // TokenSpec defines the desired state of Token
@@ -132,7 +139,7 @@ type TokenStatus struct {
 // +kubebuilder:subresource:status
 // +kubebuilder:storageversion
 
-// Token is the Schema for the Tokens API. ApiToken schema
+// Token is the Schema for the Tokens API. Provides a resource for managing unleash api tokens.
 // +kubebuilder:printcolumn:name="SYNCED",type="string",JSONPath=".status.conditions[?(@.type=='Synced')].status"
 // +kubebuilder:printcolumn:name="READY",type="string",JSONPath=".status.conditions[?(@.type=='Ready')].status"
 // +kubebuilder:printcolumn:name="EXTERNAL-NAME",type="string",JSONPath=".metadata.annotations.crossplane\\.io/external-name"
@@ -141,8 +148,10 @@ type TokenStatus struct {
 type Token struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
-	Spec              TokenSpec   `json:"spec"`
-	Status            TokenStatus `json:"status,omitempty"`
+	// +kubebuilder:validation:XValidation:rule="!('*' in self.managementPolicies || 'Create' in self.managementPolicies || 'Update' in self.managementPolicies) || has(self.forProvider.type) || (has(self.initProvider) && has(self.initProvider.type))",message="spec.forProvider.type is a required parameter"
+	// +kubebuilder:validation:XValidation:rule="!('*' in self.managementPolicies || 'Create' in self.managementPolicies || 'Update' in self.managementPolicies) || has(self.forProvider.username) || (has(self.initProvider) && has(self.initProvider.username))",message="spec.forProvider.username is a required parameter"
+	Spec   TokenSpec   `json:"spec"`
+	Status TokenStatus `json:"status,omitempty"`
 }
 
 // +kubebuilder:object:root=true

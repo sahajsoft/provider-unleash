@@ -9,8 +9,9 @@ metadata:
   namespace: default
 spec:
   forProvider:
-    environment: development
-    expiresAt: "2024-12-31T23:59:59Z"
-    project: default
-    tokenName: client-token-name
-    type: client
+    environment: "*"
+    expiresAt: "2024-10-19"
+    projects:
+      - "*"
+    type: admin
+    username: bobjoe

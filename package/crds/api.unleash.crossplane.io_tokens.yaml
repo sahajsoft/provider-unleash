@@ -34,7 +34,8 @@ spec:
     name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: Token is the Schema for the Tokens API. ApiToken schema
+        description: Token is the Schema for the Tokens API. Provides a resource for
+          managing unleash api tokens.
         properties:
           apiVersion:
             description: |-
@@ -72,38 +73,55 @@ spec:
                 type: string
               forProvider:
                 properties:
+                  createdAt:
+                    description: |-
+                      (String) The API token creation date.
+                      The API token creation date.
+                    type: string
                   environment:
                     description: |-
-                      (String) An environment the token has access to.
-                      An environment the token has access to.
+                      (String) The environment the token will have access to. Use "*" for all environments. By default, it will have access to all environments.
+                      The environment the token will have access to. Use `"*"` for all environments. By default, it will have access to all environments.
                     type: string
                   expiresAt:
                     description: |-
-                      (String) When the token expires
-                      When the token expires
-                    type: string
-                  project:
-                    description: |-
-                      (String) A project the token belongs to.
-                      A project the token belongs to.
+                      (String) The API token expiration date.
+                      The API token expiration date.
                     type: string
                   projects:
                     description: |-
-                      (Set of String) The list of projects this token has access to. If the token has access to specific projects they will be listed here. If the token has access to all projects it will be represented as [*].
-                      The list of projects this token has access to. If the token has access to specific projects they will be listed here. If the token has access to all projects it will be represented as `[*]`.
+                      (Set of String) The project(s) the token will have access to. Use ["*"] for all projects. By default, it will have access to all projects.
+                      The project(s) the token will have access to. Use `["*"]` for all projects. By default, it will have access to all projects.
                     items:
                       type: string
                     type: array
                     x-kubernetes-list-type: set
-                  tokenName:
+                  secretSecretRef:
                     description: |-
-                      (String) The name of the token.
-                      The name of the token.
-                    type: string
+                      (String, Sensitive) The API token secret.
+                      The API token secret.
+                    properties:
+                      key:
+                        description: The key to select.
+                        type: string
+                      name:
+                        description: Name of the secret.
+                        type: string
+                      namespace:
+                        description: Namespace of the secret.
+                        type: string
+                    required:
+                    - key
+                    - name
+                    - namespace
+                    type: object
                   type:
                     description: |-
-                      (String) The type of the token.
-                      The type of the token.
+                      (String) The type of the API token. Can be client, admin or frontend
+                      The type of the API token. Can be `client`, `admin` or `frontend`
+                    type: string
+                  username:
+                    description: (String)
                     type: string
                 type: object
               initProvider:
@@ -119,38 +137,55 @@ spec:
                   for example because of an external controller is managing them, like an
                   autoscaler.
                 properties:
+                  createdAt:
+                    description: |-
+                      (String) The API token creation date.
+                      The API token creation date.
+                    type: string
                   environment:
                     description: |-
-                      (String) An environment the token has access to.
-                      An environment the token has access to.
+                      (String) The environment the token will have access to. Use "*" for all environments. By default, it will have access to all environments.
+                      The environment the token will have access to. Use `"*"` for all environments. By default, it will have access to all environments.
                     type: string
                   expiresAt:
                     description: |-
-                      (String) When the token expires
-                      When the token expires
-                    type: string
-                  project:
-                    description: |-
-                      (String) A project the token belongs to.
-                      A project the token belongs to.
+                      (String) The API token expiration date.
+                      The API token expiration date.
                     type: string
                   projects:
                     description: |-
-                      (Set of String) The list of projects this token has access to. If the token has access to specific projects they will be listed here. If the token has access to all projects it will be represented as [*].
-                      The list of projects this token has access to. If the token has access to specific projects they will be listed here. If the token has access to all projects it will be represented as `[*]`.
+                      (Set of String) The project(s) the token will have access to. Use ["*"] for all projects. By default, it will have access to all projects.
+                      The project(s) the token will have access to. Use `["*"]` for all projects. By default, it will have access to all projects.
                     items:
                       type: string
                     type: array
                     x-kubernetes-list-type: set
-                  tokenName:
+                  secretSecretRef:
                     description: |-
-                      (String) The name of the token.
-                      The name of the token.
-                    type: string
+                      (String, Sensitive) The API token secret.
+                      The API token secret.
+                    properties:
+                      key:
+                        description: The key to select.
+                        type: string
+                      name:
+                        description: Name of the secret.
+                        type: string
+                      namespace:
+                        description: Namespace of the secret.
+                        type: string
+                    required:
+                    - key
+                    - name
+                    - namespace
+                    type: object
                   type:
                     description: |-
-                      (String) The type of the token.
-                      The type of the token.
+                      (String) The type of the API token. Can be client, admin or frontend
+                      The type of the API token. Can be `client`, `admin` or `frontend`
+                    type: string
+                  username:
+                    description: (String)
                     type: string
                 type: object
               managementPolicies:
@@ -320,45 +355,53 @@ spec:
             required:
             - forProvider
             type: object
+            x-kubernetes-validations:
+            - message: spec.forProvider.type is a required parameter
+              rule: '!(''*'' in self.managementPolicies || ''Create'' in self.managementPolicies
+                || ''Update'' in self.managementPolicies) || has(self.forProvider.type)
+                || (has(self.initProvider) && has(self.initProvider.type))'
+            - message: spec.forProvider.username is a required parameter
+              rule: '!(''*'' in self.managementPolicies || ''Create'' in self.managementPolicies
+                || ''Update'' in self.managementPolicies) || has(self.forProvider.username)
+                || (has(self.initProvider) && has(self.initProvider.username))'
           status:
             description: TokenStatus defines the observed state of Token.
             properties:
               atProvider:
                 properties:
+                  createdAt:
+                    description: |-
+                      (String) The API token creation date.
+                      The API token creation date.
+                    type: string
                   environment:
                     description: |-
-                      (String) An environment the token has access to.
-                      An environment the token has access to.
+                      (String) The environment the token will have access to. Use "*" for all environments. By default, it will have access to all environments.
+                      The environment the token will have access to. Use `"*"` for all environments. By default, it will have access to all environments.
                     type: string
                   expiresAt:
                     description: |-
-                      (String) When the token expires
-                      When the token expires
+                      (String) The API token expiration date.
+                      The API token expiration date.
                     type: string
                   id:
-                    type: string
-                  project:
-                    description: |-
-                      (String) A project the token belongs to.
-                      A project the token belongs to.
+                    description: (String) The ID of this resource.
                     type: string
                   projects:
                     description: |-
-                      (Set of String) The list of projects this token has access to. If the token has access to specific projects they will be listed here. If the token has access to all projects it will be represented as [*].
-                      The list of projects this token has access to. If the token has access to specific projects they will be listed here. If the token has access to all projects it will be represented as `[*]`.
+                      (Set of String) The project(s) the token will have access to. Use ["*"] for all projects. By default, it will have access to all projects.
+                      The project(s) the token will have access to. Use `["*"]` for all projects. By default, it will have access to all projects.
                     items:
                       type: string
                     type: array
                     x-kubernetes-list-type: set
-                  tokenName:
-                    description: |-
-                      (String) The name of the token.
-                      The name of the token.
-                    type: string
                   type:
                     description: |-
-                      (String) The type of the token.
-                      The type of the token.
+                      (String) The type of the API token. Can be client, admin or frontend
+                      The type of the API token. Can be `client`, `admin` or `frontend`
+                    type: string
+                  username:
+                    description: (String)
                     type: string
                 type: object
               conditions:

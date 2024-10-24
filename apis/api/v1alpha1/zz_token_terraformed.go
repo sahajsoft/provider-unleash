@@ -21,7 +21,7 @@ func (mg *Token) GetTerraformResourceType() string {
 
 // GetConnectionDetailsMapping for this Token
 func (tr *Token) GetConnectionDetailsMapping() map[string]string {
-	return map[string]string{"secret": "status.atProvider.secret"}
+	return map[string]string{"secret": "secretSecretRef"}
 }
 
 // GetObservation of this Token

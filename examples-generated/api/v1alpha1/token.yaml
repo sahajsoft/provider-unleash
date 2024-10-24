@@ -4,12 +4,13 @@ metadata:
   annotations:
     meta.upbound.io/example-id: api/v1alpha1/token
   labels:
-    testing.upbound.io/example-name: client_token
-  name: client-token
+    testing.upbound.io/example-name: my_token
+  name: my-token
 spec:
   forProvider:
-    environment: development
-    expiresAt: "2024-12-31T23:59:59Z"
-    project: default
-    tokenName: client_token
-    type: client
+    environment: '*'
+    expiresAt: "2024-10-19"
+    projects:
+    - '*'
+    type: admin
+    username: bobjoe

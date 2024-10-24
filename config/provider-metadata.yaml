@@ -1,369 +1,304 @@
-name: Unleash/unleash
+name: philips-labs/unleash
 resources:
     unleash_api_token:
         subCategory: ""
-        description: ApiToken schema
+        description: Provides a resource for managing unleash api tokens.
         name: unleash_api_token
         title: unleash_api_token Resource - terraform-provider-unleash
         examples:
-            - name: client_token
-              manifest: |-
-                {
-                  "environment": "development",
-                  "expires_at": "2024-12-31T23:59:59Z",
-                  "project": "default",
-                  "token_name": "client_token",
-                  "type": "client"
-                }
-            - name: frontend_token
-              manifest: |-
-                {
-                  "environment": "development",
-                  "expires_at": "2024-12-31T23:59:59Z",
-                  "projects": [
-                    "*"
-                  ],
-                  "token_name": "frontend_token",
-                  "type": "frontend"
-                }
-            - name: admin_token
+            - name: my_token
               manifest: |-
                 {
                   "environment": "*",
-                  "expires_at": "2024-12-31T23:59:59Z",
+                  "expires_at": "2024-10-19",
                   "projects": [
                     "*"
                   ],
-                  "token_name": "admin_token",
-                  "type": "admin"
-                }
-            - name: admin_no_expire
-              manifest: |-
-                {
-                  "token_name": "admin_no_expire",
-                  "type": "admin"
+                  "type": "admin",
+                  "username": "bobjoe"
                 }
         argumentDocs:
-            environment: (String) An environment the token has access to.
-            expires_at: (String) When the token expires
-            project: (String) A project the token belongs to.
-            projects: (Set of String) The list of projects this token has access to. If the token has access to specific projects they will be listed here. If the token has access to all projects it will be represented as [*].
-            secret: (String, Sensitive) Secret token value.
-            token_name: (String) The name of the token.
-            type: (String) The type of the token.
+            created_at: (String) The API token creation date.
+            environment: (String) The environment the token will have access to. Use "*" for all environments. By default, it will have access to all environments.
+            expires_at: (String) The API token expiration date.
+            id: (String) The ID of this resource.
+            projects: (Set of String) The project(s) the token will have access to. Use ["*"] for all projects. By default, it will have access to all projects.
+            secret: (String, Sensitive) The API token secret.
+            type: (String) The type of the API token. Can be client, admin or frontend
+            username: (String)
         importStatements: []
-    unleash_oidc Resource - terraform-provider-unleash:
+    unleash_feature:
         subCategory: ""
-        description: Manages OIDC configuration.
-        name: unleash_oidc Resource - terraform-provider-unleash
-        title: unleash_oidc Resource - terraform-provider-unleash
-        argumentDocs:
-            auto_create: (Boolean) Whether to auto create users when they login to Unleash for the first time.
-            client_id: (String) The OIDC public identifier.
-            default_root_role: (Number) The default root role give to a user when that user is created. Only used if auto_create is set to true.
-            discover_url: (String) A URL pointing to the .well-known configuration of the OIDC provider.
-            enabled: (Boolean) Whether or not OIDC is enabled.
-            secret: (String) The OIDC secret.
-        importStatements: []
-    unleash_project:
-        subCategory: ""
-        description: Project schema
-        name: unleash_project
-        title: unleash_project Resource - terraform-provider-unleash
+        description: Provides a resource for managing unleash features.
+        name: unleash_feature
+        title: unleash_feature Resource - terraform-provider-unleash
         examples:
-            - name: default_project
+            - name: example
               manifest: |-
                 {
-                  "description": "Default project now managed by Terraform",
-                  "id": "default",
-                  "name": "Default project"
+                  "name": "toggle",
+                  "project_id": "${data.unleash_project.example.project_id}",
+                  "type": "${data.unleash_feature_type.example.type_id}"
                 }
-            - name: test_project
+              references:
+                project_id: data.unleash_project.example.project_id
+                type: data.unleash_feature_type.example.type_id
+            - name: variants_example
               manifest: |-
                 {
-                  "description": "A project created through terraform",
-                  "id": "my_project",
-                  "name": "My Terraform project"
-                }
-        argumentDocs:
-            description: (String) A description of the project's purpose.
-            id: (String) Identifier for this project.
-            name: (String) The name of the project.
-        importStatements: []
-    unleash_project_access:
-        subCategory: ""
-        description: ProjectAccess schema
-        name: unleash_project_access
-        title: unleash_project_access Resource - terraform-provider-unleash
-        examples:
-            - name: sample_project_access
-              manifest: |-
-                {
-                  "project": "${unleash_project.sample_project.id}",
-                  "roles": [
+                  "name": "toggle_variants",
+                  "project_id": "${data.unleash_project.example.project_id}",
+                  "type": "${data.unleash_feature_type.example.type_id}",
+                  "variant": [
                     {
-                      "groups": [],
-                      "role": "${data.unleash_role.project_owner_role.id}",
-                      "users": [
-                        "${unleash_user.test_user.id}"
-                      ]
+                      "name": "Variant1"
                     },
                     {
-                      "groups": [],
-                      "role": "${data.unleash_role.project_member_role.id}",
-                      "users": [
-                        "${unleash_user.test_user_2.id}"
+                      "name": "Variant2",
+                      "overrides": [
+                        {
+                          "context_name": "appName",
+                          "values": [
+                            "bar",
+                            "xyz"
+                          ]
+                        },
+                        {
+                          "context_name": "environment",
+                          "values": [
+                            "development"
+                          ]
+                        }
+                      ],
+                      "payload": [
+                        {
+                          "type": "string",
+                          "value": "foo"
+                        }
                       ]
                     }
                   ]
                 }
               references:
-                project: unleash_project.sample_project.id
-              dependencies:
-                unleash_project.sample_project: |-
-                    {
-                      "id": "sample",
-                      "name": "sample-project"
-                    }
-                unleash_user.test_user: |-
-                    {
-                      "email": "test-password@getunleash.io",
-                      "name": "tester",
-                      "password": "you-will-never-guess",
-                      "root_role": "3",
-                      "send_email": false
-                    }
-                unleash_user.test_user_2: |-
-                    {
-                      "email": "test-2-password@getunleash.io",
-                      "name": "tester-2",
-                      "password": "you-will-never-guess",
-                      "root_role": "3",
-                      "send_email": false
-                    }
-            - name: default_project_access
-              manifest: |-
-                {
-                  "project": "default",
-                  "roles": [
-                    {
-                      "groups": [],
-                      "role": "${data.unleash_role.project_owner_role.id}",
-                      "users": [
-                        "${unleash_user.test_user.id}"
-                      ]
-                    }
-                  ]
-                }
-              dependencies:
-                unleash_project.sample_project: |-
-                    {
-                      "id": "sample",
-                      "name": "sample-project"
-                    }
-                unleash_user.test_user: |-
-                    {
-                      "email": "test-password@getunleash.io",
-                      "name": "tester",
-                      "password": "you-will-never-guess",
-                      "root_role": "3",
-                      "send_email": false
-                    }
-                unleash_user.test_user_2: |-
-                    {
-                      "email": "test-2-password@getunleash.io",
-                      "name": "tester-2",
-                      "password": "you-will-never-guess",
-                      "root_role": "3",
-                      "send_email": false
-                    }
+                project_id: data.unleash_project.example.project_id
+                type: data.unleash_feature_type.example.type_id
         argumentDocs:
-            groups: (Set of Number) List of projects with this role assigned.
-            project: (String) Project identifier.
-            role: (Number) The role identifier.
-            roles: (Attributes Set) Roles available in this project with their members. (see below for nested schema)
-            users: (Set of Number) List of users with this role assigned.
+            archive_on_destroy: (Boolean) Whether to archive the feature toggle on destroy. Default is true. When false, it will permanently delete the feature toggle.
+            context_name: (String)
+            description: (String) Feature description
+            id: (String) The ID of this resource.
+            name: (String) Feature name
+            overrides: (Block Set) Overrides existing context field values. Values are comma separated e.g v1, v2, ...) (see below for nested schema)
+            payload: '(Block Set, Max: 1) Variant payload. The type of the payload can be string, json or csv (see below for nested schema)'
+            project_id: (String) The feature will be created in the given project
+            stickiness: (String) Variant stickiness. Default is default.
+            type: (String) Feature type
+            value: (String)
+            values: (List of String)
+            variant: (Block List) Feature variant (see below for nested schema)
+            weight: (Number) Variant weight. Only considered when the weight_type is fix. It is calculated automatically if the weight_type is variable.
+            weight_type: (String) Variant weight type. The weight type can be fix or variable. Default is variable.
         importStatements: []
-    unleash_role:
+    unleash_feature_enabling:
         subCategory: ""
-        description: Role schema
-        name: unleash_role
-        title: unleash_role Resource - terraform-provider-unleash
+        description: Provides a resource for enabling a feature toggle in the given environment. This can be only done after the feature toggle has at least one strategy.
+        name: unleash_feature_enabling
+        title: unleash_feature_enabling Resource - terraform-provider-unleash
         examples:
-            - name: custom_root_role
+            - name: example
               manifest: |-
                 {
-                  "description": "A custom test root role",
-                  "name": "A custom role",
-                  "permissions": [
-                    {
-                      "name": "CREATE_PROJECT"
-                    },
-                    {
-                      "name": "UPDATE_PROJECT"
-                    }
+                  "depends_on": [
+                    "${unleash_strategy_assignment.example}"
                   ],
-                  "type": "root-custom"
+                  "enabled": true,
+                  "environment": "development",
+                  "feature_name": "${unleash_feature.example.name}",
+                  "project_id": "${data.unleash_project.example.project_id}"
                 }
-            - name: custom_root_role
-              manifest: |-
-                {
-                  "description": "A custom test root role",
-                  "name": "Renamed custom role",
-                  "permissions": [
+              references:
+                feature_name: unleash_feature.example.name
+                project_id: data.unleash_project.example.project_id
+              dependencies:
+                unleash_feature.example: |-
                     {
-                      "name": "CREATE_SEGMENT"
-                    },
-                    {
-                      "name": "UPDATE_SEGMENT"
+                      "name": "toggle",
+                      "project_id": "${data.unleash_project.example.project_id}",
+                      "type": "${data.unleash_feature_type.example.type_id}"
                     }
-                  ],
-                  "type": "root-custom"
-                }
-            - name: project_role
-              manifest: |-
-                {
-                  "description": "A custom test project role",
-                  "name": "Custom project role",
-                  "permissions": [
-                    {
-                      "name": "CREATE_FEATURE"
-                    },
-                    {
-                      "name": "DELETE_FEATURE"
-                    },
+                unleash_strategy_assignment.example: |-
                     {
                       "environment": "development",
-                      "name": "UPDATE_FEATURE_ENVIRONMENT"
+                      "feature_name": "${unleash_feature.example.name}",
+                      "parameters": {
+                        "groupId": "toggle",
+                        "rollout": "68",
+                        "stickiness": "random"
+                      },
+                      "project_id": "${data.unleash_project.example.project_id}",
+                      "strategy_name": "flexibleRollout"
+                    }
+        argumentDocs:
+            enabled: (Boolean) Whether the feature is on/off in the provided environment. Default is true (on).
+            environment: (String) The environment where the toggle will be enabled
+            feature_name: (String) Feature name to enabled
+            id: (String) The ID of this resource.
+            project_id: (String) The unleash project the feature is in
+        importStatements: []
+    unleash_feature_v2:
+        subCategory: ""
+        description: (Experimental) Provides a resource for managing unleash features with variants and environment strategies all in a single resource.
+        name: unleash_feature_v2
+        title: unleash_feature_v2 Resource - terraform-provider-unleash
+        examples:
+            - name: with_env_strategies
+              manifest: |-
+                {
+                  "archive_on_destroy": false,
+                  "description": "manages my nice feature",
+                  "environment": [
+                    {
+                      "enabled": false,
+                      "name": "production"
+                    },
+                    {
+                      "enabled": true,
+                      "name": "development",
+                      "strategy": [
+                        {
+                          "constraint": [
+                            {
+                              "case_insensitive": false,
+                              "context_name": "appName",
+                              "inverted": false,
+                              "operator": "SEMVER_EQ",
+                              "value": "1.0.0"
+                            },
+                            {
+                              "context_name": "appName",
+                              "operator": "IN",
+                              "values": [
+                                "foo",
+                                "bar"
+                              ]
+                            }
+                          ],
+                          "name": "remoteAddress",
+                          "parameters": {
+                            "IPs": "189.434.777.123,host.test.com"
+                          }
+                        },
+                        {
+                          "name": "flexibleRollout",
+                          "parameters": {
+                            "groupId": "toggle",
+                            "rollout": "68",
+                            "stickiness": "random"
+                          }
+                        }
+                      ]
                     }
                   ],
-                  "type": "custom"
+                  "name": "my_nice_feature",
+                  "project_id": "default",
+                  "tag": [
+                    {
+                      "type": "simple",
+                      "value": "foo"
+                    },
+                    {
+                      "type": "simple",
+                      "value": "bar"
+                    }
+                  ],
+                  "type": "release"
                 }
         argumentDocs:
-            description: (String) A more detailed description of the role and what use it's intended for.
-            environment: (String) For which environment this permission applies (note that only environment-type permissions can have an environment).
-            id: (String) The id of this role.
-            name: (String) The name of this role.
-            permissions: (Attributes Set) A more detailed description of the role and what use it's intended for. (see below for nested schema)
-            type: (String) A role can either be a global root role (applies to all roles) or a role role.
+            archive_on_destroy: (Boolean) Whether to archive the feature toggle on destroy. Default is true. When false, it will permanently delete the feature toggle.
+            case_insensitive: (Boolean) If operator is case-insensitive.
+            constraint: (Block List) Strategy constraint (see below for nested schema)
+            context_name: (String) Constraint context. Can be appName, currentTime, environment, sessionId or userId
+            description: (String) Feature description
+            enabled: (Boolean) Whether the feature is on/off in the environment. Default is true (on)
+            environment: (Block List) Use this to enable a feature in an environment and add strategies (see below for nested schema)
+            id: (String) The ID of this resource.
+            inverted: (Boolean) If constraint expressions will be negated, meaning that they get their opposite value.
+            name: (String) Feature name
+            operator: (String) Constraint operator. Can be IN, NOT_IN, STR_CONTAINS, STR_STARTS_WITH, STR_ENDS_WITH, NUM_EQ, NUM_GT, NUM_GTE, NUM_LT, NUM_LTE, SEMVER_EQ, SEMVER_GT or SEMVER_LT
+            overrides: (Block Set) Overrides existing context field values. Values are comma separated e.g v1, v2, ...) (see below for nested schema)
+            parameters: (Map of String) Strategy parameters. All the values need to informed as strings.
+            payload: '(Block Set, Max: 1) Variant payload. The type of the payload can be string, json or csv (see below for nested schema)'
+            project_id: (String) The feature will be created in the given project
+            stickiness: (String) Variant stickiness. Default is default.
+            strategy: (Block List) Strategy to add in the environment (see below for nested schema)
+            tag: (Block List) Tag to add to the feature (see below for nested schema)
+            type: (String) Feature type
+            value: (String) Value to use in the evaluation of the constraint. Applies only to DATE_, NUM_ and SEMVER_ operators.
+            values: (List of String) List of values to use in the evaluation of the constraint. Applies to all operators, except DATE_, NUM_ and SEMVER_.
+            variant: (Block List) Feature variant (see below for nested schema)
+            weight: (Number) Variant weight. Only considered when the weight_type is fix. It is calculated automatically if the weight_type is variable.
+            weight_type: (String) Variant weight type. The weight type can be fix or variable. Default is variable.
         importStatements: []
-    unleash_saml Resource - terraform-provider-unleash:
+    unleash_strategy_assignment:
         subCategory: ""
-        description: Manages SAML configuration.
-        name: unleash_saml Resource - terraform-provider-unleash
-        title: unleash_saml Resource - terraform-provider-unleash
-        argumentDocs:
-            auto_create: (Boolean) Whether to auto create users when they login to Unleash for the first time.
-            certificate: (String) The x509 certificate used by the SAML provider.
-            default_root_role: (Number) The default root role give to a user when that user is created. Only used if auto_create is set to true.
-            enabled: (Boolean) Whether SAML is enabled.
-            entity_id: (String) The SAML entity ID.
-            sign_on_url: (String) The SAML sign-on URL.
-        importStatements: []
-    unleash_service_account:
-        subCategory: ""
-        description: Service accounts do nothing on their own, they need service account tokens to be created to do anything useful. All tokens bound to a service account will take on the permissions of the root role assigned to the service account. It's strongly recommended to use the unleash_role data source to retrieve one of the built-in roles and use the id from that to set the service account role id. See the
-        name: unleash_service_account
-        title: unleash_service_account Resource - terraform-provider-unleash
+        description: Provides a resource for add strategy to a feature toggle in the given environment.
+        name: unleash_strategy_assignment
+        title: unleash_strategy_assignment Resource - terraform-provider-unleash
         examples:
-            - name: admin service account
+            - name: example
               manifest: |-
                 {
-                  "name": "something unique",
-                  "root_role": "${admin_role.id}",
-                  "username": "something unique"
+                  "environment": "development",
+                  "feature_name": "${unleash_feature.example.name}",
+                  "parameters": {
+                    "groupId": "toggle",
+                    "rollout": "68",
+                    "stickiness": "random"
+                  },
+                  "project_id": "${data.unleash_project.example.project_id}",
+                  "strategy_name": "flexibleRollout"
                 }
               references:
-                root_role: admin_role.id
-        argumentDocs:
-            id: (Number) The ID of the service account.
-            name: (String) The name of the service account.
-            root_role: (Number) The root role ID for the service account.
-            username: (String) The username for the service account.
-        importStatements: []
-    unleash_service_account_token:
-        subCategory: ""
-        description: Allows for managing the tokens bound to a service account. Note that service account tokens in Unleash are both immutable and cannot be recovered once created. This means you must use them immediately when creating them via terraform. Typically by piping them to an external secret manager or binding them to some other external terraform resource that requires Unleash tokens. Because service account tokens are immutable, any changes to the terraform resource will trigger a deletion and recreation of those tokens, meaning that the secrets will be rotated out.
-        name: unleash_service_account_token
-        title: unleash_service_account_token Resource - terraform-provider-unleash
-        examples:
-            - name: token_for_account_test
-              manifest: |-
-                {
-                  "description": "a token for the account",
-                  "expires_at": "2048-01-01T00:00:00Z",
-                  "service_account_id": "${unleash_service_account.account_for_tokens_test.id}"
-                }
-              references:
-                service_account_id: unleash_service_account.account_for_tokens_test.id
+                feature_name: unleash_feature.example.name
+                project_id: data.unleash_project.example.project_id
               dependencies:
-                external_resource.external_unleash_integration: |-
+                unleash_feature.example: |-
                     {
-                      "unleash_api_key": "${unleash_service_account_token.token_for_account_test.secret}"
-                    }
-                null_resource.store_token: |-
-                    {
-                      "provisioner": {
-                        "local-exec": [
-                          {
-                            "command": "      #!/bin/bash\n      TOKEN_VALUE=\"${unleash_service_account_token.token_for_account_test.secret}\"\n      echo \"Storing token: $TOKEN_VALUE\"\n      echo \"$TOKEN_VALUE\" \u003e /secure/location/service_account_token.txt\n"
-                          }
-                        ]
-                      },
-                      "triggers": {
-                        "token_created": "${unleash_service_account_token.token_for_account_test.secret}"
-                      }
-                    }
-                unleash_service_account.account_for_tokens_test: |-
-                    {
-                      "name": "the service account name",
-                      "root_role": 1,
-                      "username": "some descriptive name"
+                      "name": "toggle",
+                      "project_id": "${data.unleash_project.example.project_id}",
+                      "type": "${data.unleash_feature_type.example.type_id}"
                     }
         argumentDocs:
-            description: (String) The description of the service account token.
-            expires_at: (String) The expiration date of the service account token.
-            id: (Number) The ID of the service account.
-            secret: (String, Sensitive) The secret of the service account token.
-            service_account_id: (Number) The ID of the service account this token is bound to.
+            environment: (String) The environment where the strategy will take place
+            feature_name: (String) Feature name to assign the strategy to
+            id: (String) The ID of this resource.
+            parameters: (Map of String) Strategy parameters. All the values need to informed as strings.
+            project_id: (String) The unleash project the feature is in
+            strategy_id: (String) Strategy id
+            strategy_name: (String) Strategy unique name
         importStatements: []
     unleash_user:
         subCategory: ""
-        description: User schema
+        description: Provides a resource for managing unleash users.
         name: unleash_user
         title: unleash_user Resource - terraform-provider-unleash
         examples:
-            - name: admin
+            - name: my_user
               manifest: |-
                 {
-                  "email": "admin@chucknorris.com",
-                  "name": "Chuck Norris",
-                  "root_role": 1,
-                  "send_email": false
-                }
-            - name: chuck
-              manifest: |-
-                {
-                  "email": "doesnotneedemail@chucknorris.com",
-                  "name": "Chuck Norris",
-                  "root_role": 1,
-                  "send_email": false
-                }
-            - name: with_password
-              manifest: |-
-                {
-                  "email": "visiblepassword@example.com",
-                  "name": "Iam Transparent",
-                  "password": "youcanseeme",
-                  "root_role": 1,
-                  "send_email": false
+                  "email": "bob.joe@gmail.com",
+                  "name": "Bob Joe",
+                  "root_role": "Editor",
+                  "send_email": false,
+                  "username": "bobjoe"
                 }
         argumentDocs:
-            email: (String) The email of the user.
-            id: (String) Identifier for this user.
-            name: (String) The name of the user.
-            password: (String, Sensitive) The password of the user.
-            root_role: (Number) The role id for the user.
-            send_email: (Boolean) Send a welcome email to the customer or not. Defaults to true
-            username: (String) The username.
+            email: (String) The user's email address.
+            email_sent: (Boolean) Whether the welcome email was successfully sent to the user.
+            id: (String) The ID of this resource.
+            invite_link: (String) The link for the login link.
+            name: (String) The user's name.
+            root_role: (String) The role to assign to the user. Can be Admin, Editor or Viewer
+            send_email: (Boolean) Whether to send a welcome email with a login link to the user or not. Defaults to true.
+            username: (String) The user's username.
         importStatements: []
